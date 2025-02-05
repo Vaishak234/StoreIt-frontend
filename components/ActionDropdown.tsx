@@ -56,11 +56,14 @@ const ActionDropdown = ({ file }: { file: FileState; }) => {
   
     const handleAction = async (type: string) => {
         try {
+              setIsLoading(true)
             if (type === 'rename') {
                 if (!filename) return toast.error('Please enter a filename');
                 if(filename.length >30) return toast.error('please enter a filename with max 30 letters')
+              
                 const result = await renameFileApi(file._id, filename);
              if(result) {
+                 setIsLoading(false)
                  dispatch(renameFile({ id: file._id, name: filename, updatedAt: result.data.updatedAt }));
                  toast.success(result?.message || 'File renamed successfully');
              }
@@ -71,6 +74,7 @@ const ActionDropdown = ({ file }: { file: FileState; }) => {
                 const result = await deleteFileApi(file._id,file.size);
                 
               if(result){
+                  setIsLoading(false)
                   dispatch(deleteFile({ id: result?.data }));
                   toast.success(result?.message || 'File deleted successfully');
               }
@@ -124,7 +128,7 @@ const ActionDropdown = ({ file }: { file: FileState; }) => {
                 {['rename', 'delete', 'share'].includes(value) && (
                     <DialogFooter className="flex flex-col gap-3 md:flex-row text-white">
                         <Button onClick={closeAllModals} className="modal-cancel-button" >cancel</Button>
-                        <Button className="modal-submit-button" onClick={() => handleAction(action.value)}>
+                        <Button className="modal-submit-button" disabled={isLoading} onClick={() => handleAction(action.value)}>
                             <p className="capitalize">{value}</p>
                             {
                                 isLoading && <Image src="assets/icons/loader.svg" alt="loader" width={20} height={20} className="ml-2 animate-spin" />

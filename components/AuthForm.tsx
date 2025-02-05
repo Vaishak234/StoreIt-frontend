@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -67,6 +66,7 @@ const AuthForm = ({ type }: { type: FormType; }) => {
             // form.reset();
 
         } catch (error) {
+            setIsLoading(false)
             if (error instanceof AxiosError) {
                 toast.error(error.response?.data?.message || 'Error in signing up');
             } else {
