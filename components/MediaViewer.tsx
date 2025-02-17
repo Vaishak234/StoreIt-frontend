@@ -3,10 +3,9 @@ import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Download, X } from "lucide-react";
 import { getDocumentIcon, handleDownLoad } from "@/lib/utils";
 import Image from "next/image";
-import { ImageViewer, DocumentViewer, VideoPlayer } from "./MediaPlayers";
+import { ImageViewer, VideoPlayer } from "./MediaPlayers";
 import { useSelector } from "react-redux";
 import { selectFileUrls } from "@/lib/features/Files/fileSlice";
-import CircularLoader from "./ui/CircularLoader";
 
 type AllFilesUrl = {
     url: string;
@@ -28,16 +27,16 @@ const MediaViewer = ({ file, close }: { file: FileState; close: () => void; }) =
 
     const getMediaPlayer = () => {
         if (file.type === "video" || file.type === "audio") {
-            return <VideoPlayer url={allFiles[currentIndex].url} setLoading={setLoading} />;
+            return <VideoPlayer url={allFiles[currentIndex].url}  />;
         }
 
         if (file.type === "image") {
-            return <ImageViewer url={allFiles[currentIndex].url} setLoading={setLoading} />;
+            return <ImageViewer url={allFiles[currentIndex].url}  />;
         }
 
-        if (file.type === "document") {
-            return <DocumentViewer url={allFiles[currentIndex].url} setLoading={setLoading} />;
-        }
+        // if (file.type === "document") {
+        //     return <DocumentViewer url={allFiles[currentIndex].url}  />;
+        // }
 
         if (file.type === "other") {
             return "other";
