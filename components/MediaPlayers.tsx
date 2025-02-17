@@ -2,11 +2,11 @@
 import Image from 'next/image';
 import React, { useState } from 'react';
 import ReactPlayer from 'react-player';
-import { Viewer, Worker } from '@react-pdf-viewer/core';
-import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+// import { Viewer, Worker } from '@react-pdf-viewer/core';
+// import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 
-import "@react-pdf-viewer/core/lib/styles/index.css";
-import "@react-pdf-viewer/default-layout/lib/styles/index.css";
+// import "@react-pdf-viewer/core/lib/styles/index.css";
+// import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 
 export const VideoPlayer = ({ url }: { url: string; }) => {
@@ -51,16 +51,16 @@ export const ImageViewer = ({ url }: { url: string; }) => {
 };
 
 
-export function DocumentViewer({ url }: { url: string }) {
-  const defaultLayoutPluginInstance = defaultLayoutPlugin(); // Enables zoom, sidebar, etc.
+// export function DocumentViewer({ url }: { url: string }) {
+//   const defaultLayoutPluginInstance = defaultLayoutPlugin(); // Enables zoom, sidebar, etc.
 
-  return (
-    <div className="h-[90vh] w-[1000px] flex justify-center items-center bg-gray-100 rounded-lg shadow-lg p-4">
-      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-        <div className="w-full max-w-[800px] h-full overflow-auto border border-gray-300 shadow-lg">
-          <Viewer fileUrl={url} plugins={[defaultLayoutPluginInstance]} />
-        </div>
-      </Worker>
-    </div>
-  );
-}
+//   return (
+//     <div className="h-[90vh] w-[1000px] flex justify-center items-center bg-gray-100 rounded-lg shadow-lg p-4">
+//       <Worker workerUrl={`https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.worker.min.js`}>
+//         <div className="w-full max-w-[800px] h-full overflow-auto border border-gray-300 shadow-lg">
+//           <Viewer fileUrl={url} plugins={[defaultLayoutPluginInstance]} />
+//         </div>
+//       </Worker>
+//     </div>
+//   );
+// }

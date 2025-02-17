@@ -125,7 +125,7 @@ export const convertTypetoPath = (type: string) => {
     case "other":
       return "others"
     default:
-      return ["document"];
+      return "documents";
   }
 };
 

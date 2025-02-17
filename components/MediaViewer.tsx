@@ -72,12 +72,7 @@ const MediaViewer = ({ file, close }: { file: FileState; close: () => void; }) =
 
             <div className="flex justify-center items-center h-[calc(100vh-100px)]">
                 <div className="relative">
-                    {loading && (
-                        <div className="absolute flex justify-center items-center">
-                            <CircularLoader />
-                        </div>
-                    )}
-                  
+                   
                         <>
                             <button
                                 onClick={handlePrev}
