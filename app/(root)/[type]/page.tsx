@@ -1,6 +1,7 @@
 'use client';
 import ProtectedRoutes from '@/components/accessControl/ProtectedRoutes';
 import Card from '@/components/Card';
+import MediaViewer from '@/components/MediaViewer';
 import Sort from '@/components/Sort';
 import CircularLoader from '@/components/ui/CircularLoader';
 import { selectFiles, selectTotalSize, setFilesState } from '@/lib/features/Files/fileSlice';
@@ -16,6 +17,7 @@ const Page = () => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedFile , setSelectedFile] = useState<FileState | null>(null)
     const dispatch = useDispatch();
     const params = useParams<{ type?: string; }>();
     const query = useSearchParams();
@@ -53,6 +55,7 @@ const Page = () => {
         fetchFiles();
     }, [type, sort]);
 
+    
 
 
     if (loading) {
@@ -94,7 +97,7 @@ const Page = () => {
                         files.length > 0 ? (
 
                             files.map((file, index) => (
-                                <Card key={index} file={file} />
+                                <Card key={index} file={file} setSelectedFile={setSelectedFile}/>
                             ))
                         ) : (
 
@@ -111,6 +114,15 @@ const Page = () => {
 
 
             </div>
+
+            {
+                selectedFile && (
+                    
+                    <MediaViewer file={selectedFile} close={()=>setSelectedFile(null)} />
+                )
+            }
+
+
         </ProtectedRoutes>
     );
 };

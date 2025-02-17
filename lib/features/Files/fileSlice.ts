@@ -1,7 +1,8 @@
 'use client';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
-import { getDomainOfItemsWithSameAxis } from 'recharts/types/util/ChartUtils';
+import { createSelector } from '@reduxjs/toolkit';
+// import { getDomainOfItemsWithSameAxis } from 'recharts/types/util/ChartUtils';
 
 type FileTypesState ={
     _id: string,
@@ -32,7 +33,7 @@ const fileSlice = createSlice({
     reducers: {
 
         setFilesState: (state, action: PayloadAction<{ data: FileDataType, type: string; }>) => {
-            const { data, type } = action.payload;
+            const { data } = action.payload;
 
 
             if (data?.files) {
@@ -58,7 +59,7 @@ const fileSlice = createSlice({
             
             if (type === 'home') {
            
-                if (state.files.length >= 6) {
+                if (state.files.length >= 8) {
                     state.files.pop()
                 }
 
@@ -114,6 +115,11 @@ const fileSlice = createSlice({
 export const selectFiles = (state: RootState) => state.files.files;
 export const selectFilesType = (state: RootState) => state.files.type;
 export const selectTotalSize = (state: RootState) => state.files.totalSize;
+
+export const selectFileUrls = createSelector(
+    (state: RootState) => state.files.files,
+    (files) => files.map((file: FileState) => ({ url: file.url, name: file.name, type: file.type }))
+);
 
 export const { setFilesState, addFileState, deleteFile, renameFile } = fileSlice.actions;
 

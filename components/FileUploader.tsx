@@ -12,6 +12,7 @@ import { addFileState } from '@/lib/features/Files/fileSlice';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'next/navigation';
 import { generateUrlApi } from '@/lib/services/fileServices';
+import { updateUserStorage } from '@/lib/features/User/userSlice';
 
 const FileUploader = () => {
     const [files, setFiles] = useState<File[]>([]);
@@ -39,102 +40,102 @@ const FileUploader = () => {
         const formData = new FormData();
         acceptedFiles.forEach((file) => formData.append('files', file));
 
-        // try {
+        try {
            
-        //     const data = await generateUrlApi(formData)
+            const data = await generateUrlApi(formData)
 
-        //     data?.data.map((file: any) => {
-        //         setUploadLoader((prev) => ({
-        //             ...prev, [file.name]: true
-        //         }));
-        //     });
+            data?.data.map((file: any) => {
+                setUploadLoader((prev) => ({
+                    ...prev, [file.name]: true
+                }));
+            });
 
-        //     const uploadPromises = acceptedFiles.map(async (file, index) => {
-        //         const fileData = data.data[index];
+            const uploadPromises = acceptedFiles.map(async (file, index) => {
+                const fileData = data.data[index];
 
-        //         // abort controller for canceling request
-        //         const controller = new AbortController();
+                // abort controller for canceling request
+                const controller = new AbortController();
 
-        //         setAbortControllers((prevControllers) => ({
-        //             ...prevControllers,
-        //             [file.name]: controller,
-        //         }));
+                setAbortControllers((prevControllers) => ({
+                    ...prevControllers,
+                    [file.name]: controller,
+                }));
 
-        //         try {
-        //             const uploadResponse = await axios.put(fileData.url, file, {
-        //                 headers: { 'Content-Type': file.type },
-        //                 signal: controller.signal,
-        //                 onUploadProgress: (progressEvent) => {
-        //                     const { loaded, total } = progressEvent;
-        //                     if (total) {
-        //                         const progress = Math.round((loaded / total) * 100);
+                try {
+                    const uploadResponse = await axios.put(fileData.url, file, {
+                        headers: { 'Content-Type': file.type },
+                        signal: controller.signal,
+                        onUploadProgress: (progressEvent) => {
+                            const { loaded, total } = progressEvent;
+                            if (total) {
+                                const progress = Math.round((loaded / total) * 100);
 
-        //                         setUploadProgress((prevProgress) => ({
-        //                             ...prevProgress,
-        //                             [file.name]: progress,
-        //                         }));
-        //                     }
-        //                 },
-        //             });
+                                setUploadProgress((prevProgress) => ({
+                                    ...prevProgress,
+                                    [file.name]: progress,
+                                }));
+                            }
+                        },
+                    });
 
-        //             if (uploadResponse.status !== 200) {
-        //                 throw new Error(`Failed to upload file: ${file.name}`);
-        //             }
+                    if (uploadResponse.status !== 200) {
+                        throw new Error(`Failed to upload file: ${file.name}`);
+                    }
 
-        //             const response = await axiosPrivate.post('/file/upload', fileData);
+                    const response = await axiosPrivate.post('/file/upload', fileData);
 
-        //             if (response.status !== 200) {
-        //                 throw new Error(`Failed to record file upload for: ${file.name}`);
-        //             }
+                    if (response.status !== 200) {
+                        throw new Error(`Failed to record file upload for: ${file.name}`);
+                    }
 
-        //             setFiles((prev) => prev.filter((f) => f.name !== file.name));
-        //             setUploadProgress((prev) => {
-        //                 const { [file.name]: _, ...rest } = prev; // Removes file2
-        //                 return rest; // returns the new object without file2
-        //             });
-        //             setUploadLoader((prev) => ({
-        //                 ...prev,
-        //                 [file.name]: false,
-        //             }));
+                    setFiles((prev) => prev.filter((f) => f.name !== file.name));
+                    setUploadProgress((prev) => {
+                        const { [file.name]: _, ...rest } = prev; // Removes file2
+                        return rest; // returns the new object without file2
+                    });
+                    setUploadLoader((prev) => ({
+                        ...prev,
+                        [file.name]: false,
+                    }));
                    
-        //             dispatch(addFileState({ data: response.data?.data, type: types[0] }));
-
-        //             return { status: 'fulfilled', data: response.data };
-        //         } catch (error) {
+                    dispatch(addFileState({ data: response.data?.data, type: types[0] }));
+                    dispatch(updateUserStorage({size:response?.data?.data.size}))
+                    return { status: 'fulfilled', data: response.data };
+                } catch (error) {
 
                     
-        //             setFiles((prev) => prev.filter((f) => f.name !== file.name)); // Clean up the file from state
-        //             if (axios.isAxiosError(error) && error.name === 'CanceledError') {
-        //                 // Handle AbortError specific to the file cancelation
-        //                 return { status: 'rejected', error };
-        //             }
+                    setFiles((prev) => prev.filter((f) => f.name !== file.name)); // Clean up the file from state
+                    if (axios.isAxiosError(error) && error.name === 'CanceledError') {
+                        // Handle AbortError specific to the file cancelation
+                        return { status: 'rejected', error };
+                    }
 
-        //             toast.error(`Error uploading file ${file.name}`);
-        //             return { status: 'rejected', error };
-        //         }
-        //     });
+                    toast.error(`Error uploading file ${file.name}`);
+                    return { status: 'rejected', error };
+                }
+            });
 
-        //     const results = await Promise.all(uploadPromises);
-        //     const allSuccessful = results.every((result) => result.status === 'fulfilled');
+            const results = await Promise.all(uploadPromises);
+            const allSuccessful = results.every((result) => result.status === 'fulfilled');
 
-        //     if (allSuccessful) {
-        //         toast.success('Files uploaded successfully');
-        //     }
-        //     setUploadLoader({})
-        //     setFiles([])
-        // } catch (error) {
+            if (allSuccessful) {
+                toast.success('Files uploaded successfully');
+            }
+            setUploadLoader({})
+            setFiles([])
+        } catch (error) {
            
-        //     setUploadLoader({})
-        //     setUploadProgress({})
-        //     setFiles([])
-        //     setFiles([])
-        //     console.log(error);
+            setUploadLoader({})
+            setUploadProgress({})
+            setFiles([])
+            setFiles([])
+            console.log(error);
             
-        //     if(error instanceof AxiosError){
-        //        return  toast.error(error.response?.data?.message || error.message);
-        //     }
-        //     toast.error('File upload failed');
-        // }
+            if(error instanceof AxiosError){
+               return  toast.error(error.response?.data?.message || error.message);
+            }
+            toast.error('File upload failed');
+        }
     }, [type]);
 
 

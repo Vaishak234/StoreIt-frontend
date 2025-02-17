@@ -6,7 +6,7 @@ import FormatedDateTime from "@/components/FormatedDateTime";
 import Thumbnail from "@/components/Thumbnail";
 import { axiosPrivate } from "@/lib/axios/axios";
 import { selectFiles, selectFilesType, selectTotalSize, setFilesState } from "@/lib/features/Files/fileSlice";
-import { convertFileSize, getDocumentIcon, getFileIcon } from "@/lib/utils";
+import { convertFileSize, convertTypetoPath, getDocumentIcon, getFileIcon } from "@/lib/utils";
 import { Separator } from "@radix-ui/react-menubar";
 import Image from "next/image";
 import Link from "next/link";
@@ -39,7 +39,7 @@ export default function Home() {
         let files = data?.data?.recentFiles || []
         let fileTypes = data?.data?.filesSpace || []
 
-         dispatch(setFilesState({ data: { totalSize, files, fileTypes } , type:'home'} ))
+        dispatch(setFilesState({ data: { totalSize, files, fileTypes } , type:'home'} ))
         setIsLoading(false);
 
       } catch (error) {
@@ -61,13 +61,12 @@ export default function Home() {
           <ul className="dashboard-summary-list ">
             {usageSummary?.map((summary: any,index) => (
               <Link
-              target="_blank"
-                href={`/${summary._id}`}
+                href={`/${convertTypetoPath(summary._id)}`}
                 key={summary._id}
                 className="dashboard-summary-card"
               >
                 <div className="space-y-4">
-                  <div className="flex justify-between gap-3">
+                  <div className="flex justify-between gap-3">  
                     <div className="">
                     <figure className=' bg-light-400 flex justify-center items-center rounded-full overflow-hidden p-2'>
                       <Image src={getDocumentIcon(summary._id)} alt='thumbnail' width={100} height={100} className='object-cover w-full h-full' />

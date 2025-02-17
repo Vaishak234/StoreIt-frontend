@@ -28,10 +28,11 @@ import { useDispatch } from "react-redux";
 import { setUserState } from "@/lib/features/User/userSlice";
 
 
-const OtpModal = ({ email }: { email: string }) => {    
+const OtpModal = ({ email ,otpValue }: { email: string ,otpValue:string }) => {    
 
     const [isOpen, setIsOpen] = useState(true);
     const [otp, setOtp] = useState('');
+
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter()
     const dispatch = useDispatch()
@@ -61,9 +62,7 @@ const OtpModal = ({ email }: { email: string }) => {
         }
     };
 
-    const handleResendOtp = async () => {
-        // api call to resend otp
-    };
+   
 
     return (
         <div>
@@ -108,8 +107,8 @@ const OtpModal = ({ email }: { email: string }) => {
 
                     </AlertDialogFooter>
                     <div className="text-center text-light-200">
-                        Didn't get a code ?
-                        <Button type="button" variant="link" className="pl-1 text-brand" onClick={handleResendOtp}>Resend code</Button>
+                        Your Resend Subscription is Expired
+                        <Button type="button" variant="link" className="pl-1 text-brand" >{otpValue}</Button>
                     </div>
                 </AlertDialogContent>
             </AlertDialog>

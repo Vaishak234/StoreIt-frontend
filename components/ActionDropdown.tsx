@@ -28,12 +28,11 @@ import { deleteFileApi, renameFileApi } from "@/lib/services/fileServices";
 import { useDispatch } from "react-redux";
 import { deleteFile, renameFile } from "@/lib/features/Files/fileSlice";
 import toast from "react-hot-toast";
-import {  handleDownLoad } from "@/lib/utils";
-
+import { handleDownLoad } from "@/lib/utils";
+import { updateUserStorage } from "@/lib/features/User/userSlice";
 
 const ActionDropdown = ({ file }: { file: FileState; }) => {
 
-   
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [action, setAction] = useState<ActionType | null>(null);
@@ -52,43 +51,41 @@ const ActionDropdown = ({ file }: { file: FileState; }) => {
         setFileName(file.name);
     }, [file.name])
 
-
-  
-    const handleAction = async (type: string) => {
+    const handleAction = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, type: string) => {
+        e.stopPropagation();
         try {
-              setIsLoading(true)
+            setIsLoading(true)
             if (type === 'rename') {
                 if (!filename) return toast.error('Please enter a filename');
-                if(filename.length >30) return toast.error('please enter a filename with max 30 letters')
-              
+                if (filename.length > 30) return toast.error('please enter a filename with max 30 letters')
+
                 const result = await renameFileApi(file._id, filename);
-             if(result) {
-                 setIsLoading(false)
-                 dispatch(renameFile({ id: file._id, name: filename, updatedAt: result.data.updatedAt }));
-                 toast.success(result?.message || 'File renamed successfully');
-             }
+                if (result) {
+                    setIsLoading(false)
+                    dispatch(renameFile({ id: file._id, name: filename, updatedAt: result.data.updatedAt }));
+                    toast.success(result?.message || 'File renamed successfully');
+                }
             }
 
             if (type === 'delete') {
 
-                const result = await deleteFileApi(file._id,file.size);
-                
-              if(result){
-                  setIsLoading(false)
-                  dispatch(deleteFile({ id: result?.data }));
-                  toast.success(result?.message || 'File deleted successfully');
-              }
+                const result = await deleteFileApi(file._id, file.size);
+
+                if (result) {
+                    setIsLoading(false)
+                    dispatch(deleteFile({ id: result?.data }));
+                    dispatch(updateUserStorage({ size: -file.size }))
+                    toast.success(result?.message || 'File deleted successfully');
+                }
             }
 
             closeAllModals();
         } catch (error) {
-           
+
             closeAllModals();
             toast.error('An error occurred while processing your request');
         }
     };
-
-
 
     const renderDialogContent = () => {
         if (!action) return null;
@@ -96,7 +93,7 @@ const ActionDropdown = ({ file }: { file: FileState; }) => {
         const { value, label } = action;
 
         return (
-            <DialogContent className="shad-dialog button"  >
+            <DialogContent className="shad-dialog button" onClick={(e)=>e.stopPropagation()}  >
                 <DialogHeader className="flex flex-col gap-3">
                     <DialogTitle className="text-center text-light-100">
                         {label}
@@ -128,7 +125,7 @@ const ActionDropdown = ({ file }: { file: FileState; }) => {
                 {['rename', 'delete', 'share'].includes(value) && (
                     <DialogFooter className="flex flex-col gap-3 md:flex-row text-white">
                         <Button onClick={closeAllModals} className="modal-cancel-button" >cancel</Button>
-                        <Button className="modal-submit-button" disabled={isLoading} onClick={() => handleAction(action.value)}>
+                        <Button className="modal-submit-button" disabled={isLoading} onClick={(e) => handleAction(e, action.value)}>
                             <p className="capitalize">{value}</p>
                             {
                                 isLoading && <Image src="assets/icons/loader.svg" alt="loader" width={20} height={20} className="ml-2 animate-spin" />
@@ -143,19 +140,26 @@ const ActionDropdown = ({ file }: { file: FileState; }) => {
 
     return (
         <>
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen} >
+            <Dialog open={isModalOpen} onOpenChange={(open) => {
+                setIsModalOpen(open);
+                if (!open) {
+                    closeAllModals();
+                }
+            }}>
                 <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen} >
                     <DropdownMenuTrigger className="shad-no-focus">
                         <Image src="/assets/icons/dots.svg" alt="dots" width={34} height={34} />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-[200px] mr-4">
+                    <DropdownMenuContent className="w-[200px] mr-4" onClick={(e)=>e.stopPropagation()}>
 
                         <DropdownMenuLabel className="max-w-[200px] w-full truncate">My Account </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         {
                             actionsDropdownItems?.map((item, index) => (
                                 <DropdownMenuItem key={index} className="shad-dropdown-item"
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+
                                         setAction(item);
 
                                         if (
@@ -194,7 +198,6 @@ const ActionDropdown = ({ file }: { file: FileState; }) => {
                         }
                     </DropdownMenuContent>
                 </DropdownMenu>
-
 
                 {renderDialogContent()}
 

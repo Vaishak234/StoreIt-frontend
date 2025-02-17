@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx"
+import toast from "react-hot-toast";
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]): string {
@@ -13,7 +14,9 @@ export const handleDownLoad = async (url: string) => {
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error('Failed to fetch the file');
+  
+    toast.error('This file cannot be downaloaded')
+    return 
   }
 
   const blob = await response.blob();
@@ -99,8 +102,28 @@ export const getFileTypesParams = (type: string) => {
       return ["image"];
     case "media":
       return ["video"];
+    case "audio":
+      return ["audio"];
     case "others":
       return ["other"];
+    default:
+      return ["document"];
+  }
+};
+
+
+export const convertTypetoPath = (type: string) => {
+  switch (type) {
+    case "document":
+      return "documents";
+    case "image":
+      return "images"
+    case "video":
+      return "media"
+    case "audio":
+      return "media"
+    case "other":
+      return "others"
     default:
       return ["document"];
   }

@@ -38,7 +38,7 @@ const AuthForm = ({ type }: { type: FormType; }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [errMessage, setErrMessage] = useState('');
     const [openOtp, setOpenOtp] = useState(false);
-
+    const [otpValue, setOtpValue] = useState('');
 
 
     const formSchema = authFormSchema(type);
@@ -58,9 +58,9 @@ const AuthForm = ({ type }: { type: FormType; }) => {
             const response = type === 'sign-up'
                 ? await axios.post('/auth/sign-up', values)
                 : await axios.post('/auth/sign-in', { email: values.email });
-
-
+            
             toast.success(response?.data.message);
+            setOtpValue(response.data.data)
             setOpenOtp(true);
             setIsLoading(false);
             // form.reset();
@@ -158,7 +158,7 @@ const AuthForm = ({ type }: { type: FormType; }) => {
             {/* otp verification */}
 
             {
-                openOtp && <OtpModal email={form.getValues("email")} />
+                openOtp && <OtpModal otpValue={otpValue} email={form.getValues("email")} />
             }
         </>
     );
